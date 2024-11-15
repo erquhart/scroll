@@ -1,6 +1,8 @@
 import type { Editor } from "@tiptap/core";
 import { Extension } from "@tiptap/core";
 import Placeholder from "@tiptap/extension-placeholder";
+import * as collab from "@tiptap/pm/collab";
+import { Step } from "@tiptap/pm/transform";
 import type { Editor as ReactEditor } from "@tiptap/react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { type ConvexReactClient, useQuery } from "convex/react";
@@ -20,8 +22,6 @@ import {
 import type { Duration } from "luxon";
 import { DateTime } from "luxon";
 import { Lens } from "monocle-ts";
-import * as collab from "prosemirror-collab";
-import { Step } from "prosemirror-transform";
 import {
   type Dispatch,
   type ReactElement,
@@ -33,7 +33,6 @@ import { useInView } from "react-intersection-observer";
 import { match, P } from "ts-pattern";
 
 import { api } from "~src/convex/_generated/api";
-import type { Id } from "~src/convex/_generated/dataModel";
 import * as cmdExtra from "~src/elm-ts/cmd-extra";
 import { runMutation } from "~src/elm-ts/convex-elm-ts";
 import * as dispatch from "~src/elm-ts/dispatch-extra";
@@ -52,7 +51,7 @@ export type Model =
 
 type LoadingNoteAndClientIdModel = {
   _tag: "LoadingNoteAndClientId";
-  noteId: Id<"notes">;
+  noteId: string;
   optionVersionedNote: Option<VersionedNote>;
   optionClientId: Option<string>;
 };
@@ -65,7 +64,7 @@ type LoadingEditorModel = {
 
 type LoadedModel = {
   _tag: "Loaded";
-  noteId: Id<"notes">;
+  noteId: string;
   creationTime: number;
   initialProseMirrorDoc: string;
   initialVersion: number;
@@ -80,7 +79,7 @@ type IntersectionStatus =
   | "EntirelyAbove"
   | "EntirelyBelow";
 
-export const init = (noteId: Id<"notes">): [Model, Cmd<Msg>] => [
+export const init = (noteId: string): [Model, Cmd<Msg>] => [
   {
     _tag: "LoadingNoteAndClientId",
     noteId,
@@ -99,7 +98,7 @@ export const init = (noteId: Id<"notes">): [Model, Cmd<Msg>] => [
   ),
 ];
 
-export const noteId = (model: Model): Id<"notes"> =>
+export const noteId = (model: Model): string =>
   match(model)
     .with({ _tag: "LoadingNoteAndClientId", noteId: P.select() }, identity)
     .with(
@@ -495,7 +494,7 @@ const LoadingNoteAndClientId = ({
   noteId: noteId_,
 }: {
   dispatch: Dispatch<Msg>;
-  noteId: Id<"notes">;
+  noteId: string;
 }) => {
   const optionVersionedNote = option.fromNullable(
     useQuery(api.getVersionedNote.default, { noteId: noteId_ }),
@@ -534,7 +533,7 @@ const LoadingEditorOrLoaded = ({
 }: {
   dispatch: Dispatch<Msg>;
   currentTime: number;
-  noteId: Id<"notes">;
+  noteId: string;
   creationTime: number;
   initialProseMirrorDoc: string;
   initialVersion: number;

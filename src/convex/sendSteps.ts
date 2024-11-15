@@ -1,32 +1,23 @@
-import type { Id } from "~src/convex/_generated/dataModel";
+import { v } from "convex/values";
+
 import { mutation } from "~src/convex/_generated/server";
 import { tiptap } from "~src/convex/tiptap";
 
-export default mutation(
-  async (
-    ctx,
-    {
-      noteId,
-      clientId,
-      clientPersistedVersion,
-      steps,
-    }: {
-      noteId: Id<"notes">;
-      clientId: string;
-      clientPersistedVersion: number;
-      steps: string[];
-    },
-  ): Promise<void> => {
+export default mutation({
+  args: {
+    noteId: v.string(),
+    clientId: v.string(),
+    clientPersistedVersion: v.number(),
+    steps: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
     const userIdentity = await ctx.auth.getUserIdentity();
     if (!userIdentity) {
       throw "Not authenticated";
     }
     await tiptap.applySteps(ctx, {
+      ...args,
       owner: userIdentity.tokenIdentifier,
-      noteId: noteId.toString(),
-      clientId,
-      clientPersistedVersion,
-      steps,
     });
   },
-);
+});

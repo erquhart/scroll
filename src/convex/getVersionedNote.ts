@@ -1,32 +1,19 @@
-import type { Id } from "~src/convex/_generated/dataModel";
-import { query } from "~src/convex/_generated/server";
-import getNoteVersion from "~src/convex/getNoteVersion";
-import type { VersionedNote } from "~src/versioned-note";
+import { v } from "convex/values";
 
-export default query(
-  async (
-    { db, auth },
-    { noteId }: { noteId: Id<"notes"> },
-  ): Promise<VersionedNote> => {
-    const userIdentity = await auth.getUserIdentity();
+import { query } from "~src/convex/_generated/server";
+import { tiptap } from "~src/convex/tiptap";
+
+export default query({
+  args: {
+    noteId: v.string(),
+  },
+  handler: async (ctx, { noteId }) => {
+    const userIdentity = await ctx.auth.getUserIdentity();
 
     if (userIdentity) {
-      const note = await db.get(noteId);
-
-      if (note === null) {
-        throw "Failed to find note";
-      } else if (note.owner !== userIdentity.tokenIdentifier) {
-        throw "User doesn't own this note";
-      }
-
-      const version = await getNoteVersion(db, note._id);
-
-      return {
-        ...note,
-        version,
-      };
+      return tiptap.getNote(ctx, userIdentity.tokenIdentifier, noteId);
     } else {
       throw "Unauthenticated";
     }
   },
-);
+});

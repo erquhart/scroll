@@ -26,7 +26,6 @@ import React from "react";
 import { match, P } from "ts-pattern";
 
 import { api } from "~src/convex/_generated/api";
-import type { Id } from "~src/convex/_generated/dataModel";
 import type { DatePaginationCursors } from "~src/date-pagination-cursors";
 import * as cmdExtra from "~src/elm-ts/cmd-extra";
 import { runMutation } from "~src/elm-ts/convex-elm-ts";
@@ -64,12 +63,12 @@ export type Msg =
   | { _tag: "NoteCreated" }
   | {
       _tag: "GotNoteMsg";
-      noteId: Id<"notes">;
+      noteId: string;
       msg: note.Msg;
     }
   | {
       _tag: "GotNotes";
-      noteIds: Id<"notes">[];
+      noteIds: string[];
     };
 
 export const update =
@@ -178,7 +177,7 @@ export const update =
                 pipe(
                   loadedNotesModel.noteModels,
                   array.findIndex<note.Model>((noteModel) =>
-                    id.getEq<"notes">().equals(noteId, note.noteId(noteModel)),
+                    id.getEq().equals(noteId, note.noteId(noteModel)),
                   ),
                   either.fromOption(() =>
                     logMessage.error("Failed to find note index by ID"),
@@ -334,15 +333,15 @@ export const update =
     );
 
 const reconcileNotes = (
-  latestNoteIds: Id<"notes">[],
+  latestNoteIds: string[],
   currentNoteModels: note.Model[],
 ): Either<LogMessage, [note.Model[], Cmd<Msg>]> =>
   pipe(
     latestNoteIds,
-    array.difference(id.getEq<"notes">())(
+    array.difference(id.getEq())(
       array.map(note.noteId)(currentNoteModels),
     ),
-    array.reduce<Id<"notes">, [note.Model[], Cmd<Msg>[]]>(
+    array.reduce<string, [note.Model[], Cmd<Msg>[]]>(
       [[], []],
       (result, noteId) =>
         pipe(
@@ -371,16 +370,14 @@ const reconcileNotes = (
             newNoteModelCmds,
             tuple.fst,
             array.findFirst((noteModel: note.Model): boolean =>
-              id.getEq<"notes">().equals(note.noteId(noteModel), latestNoteId),
+              id.getEq().equals(note.noteId(noteModel), latestNoteId),
             ),
             option.match(
               () =>
                 pipe(
                   currentNoteModels,
                   array.findFirst((noteModel: note.Model): boolean =>
-                    id
-                      .getEq<"notes">()
-                      .equals(note.noteId(noteModel), latestNoteId),
+                    id.getEq().equals(note.noteId(noteModel), latestNoteId),
                   ),
                 ),
               (noteModel) => option.some(noteModel),
@@ -400,11 +397,11 @@ const reconcileNotes = (
   );
 
 const noteIdsToNoteModels = (
-  noteIds: Id<"notes">[],
+  noteIds: string[],
 ): [note.Model[], Cmd<Msg>] =>
   pipe(
     noteIds,
-    array.reduce<Id<"notes">, [note.Model[], Cmd<Msg>[]]>(
+    array.reduce<string, [note.Model[], Cmd<Msg>[]]>(
       [[], []],
       (result, noteId) =>
         pipe(
@@ -458,14 +455,14 @@ const View = ({
 
   useStableEffect(
     () => {
-      option.match(constVoid, (noteIds__: Id<"notes">[]) =>
+      option.match(constVoid, (noteIds__: string[]) =>
         dispatch_({ _tag: "GotNotes", noteIds: noteIds__ }),
       )(noteIds_);
     },
     [dispatch_, noteIds_],
     eq.tuple(
       dispatch.getEq<Msg>(),
-      option.getEq(array.getEq(id.getEq<"notes">())),
+      option.getEq(array.getEq(id.getEq())),
     ),
   );
 

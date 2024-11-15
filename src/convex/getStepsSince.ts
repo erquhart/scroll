@@ -1,11 +1,16 @@
-import type { Id } from "~src/convex/_generated/dataModel";
+import { v } from "convex/values";
+
 import { query } from "~src/convex/_generated/server";
 import { tiptap } from "~src/convex/tiptap";
 
-export default query(
-  async (
+export default query({
+  args: {
+    noteId: v.string(),
+    version: v.number(),
+  },
+  handler: async (
     ctx,
-    { noteId, version }: { noteId: Id<"notes">; version: number },
+    { noteId, version },
   ): Promise<{ proseMirrorStep: string; clientId: string }[]> => {
     const userIdentity = await ctx.auth.getUserIdentity();
     if (userIdentity) {
@@ -18,4 +23,4 @@ export default query(
       return Promise.reject();
     }
   },
-);
+});
