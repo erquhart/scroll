@@ -1,20 +1,11 @@
-import { EditorState } from "prosemirror-state";
-
 import { mutation } from "~src/convex/_generated/server";
-import { schema } from "~src/tiptap-schema-extensions";
+import { tiptap } from "~src/convex/tiptap";
 
-export default mutation(async ({ db, auth }): Promise<void> => {
-  const userIdentity = await auth.getUserIdentity();
+export default mutation(async (ctx): Promise<void> => {
+  const userIdentity = await ctx.auth.getUserIdentity();
 
   if (userIdentity) {
-    const proseMirrorDoc = JSON.stringify(
-      EditorState.create({ schema }).doc.toJSON(),
-    );
-
-    await db.insert("notes", {
-      proseMirrorDoc,
-      owner: userIdentity.tokenIdentifier,
-    });
+    await tiptap.createNote(ctx, userIdentity.tokenIdentifier);
   } else {
     throw "You must be logged in to create a note!";
   }
