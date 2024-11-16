@@ -1,4 +1,4 @@
-import tiptap from "@convex-dev/tiptap/convex.config";
+import tiptap from "@erquhart/convex-tiptap/convex.config";
 import { defineApp } from "convex/server";
 
 const app = defineApp();

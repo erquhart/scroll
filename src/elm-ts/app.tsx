@@ -160,11 +160,9 @@ const ConvexProviderWithClerk = ({
   return <ConvexProvider client={convexClient}>{children}</ConvexProvider>;
 };
 
-export const view: (model: Model) => Html<Msg> = (model) => (dispatch) => {
-  console.log("model", model);
-  return (
-    <ClerkProvider
-      publishableKey={clerkPublishableKey.fromStage(model.stage)}
+export const view: (model: Model) => Html<Msg> = (model) => (dispatch) => (
+  <ClerkProvider
+    publishableKey={clerkPublishableKey.fromStage(model.stage)}
     appearance={appearance}
   >
     <ConvexProviderWithClerk
@@ -180,9 +178,8 @@ export const view: (model: Model) => Html<Msg> = (model) => (dispatch) => {
         apply(dispatch),
       )}
     </ConvexProviderWithClerk>
-    </ClerkProvider>
-  );
-};
+  </ClerkProvider>
+);
 
 // SUBSCRIPTIONS
 

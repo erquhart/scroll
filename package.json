@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "4.30.5",
-    "@convex-dev/tiptap": "1.0.0",
+    "@erquhart/convex-tiptap": "^0.1.1",
     "@fontsource-variable/jetbrains-mono": "^5.0.19",
     "@fontsource-variable/lora": "^5.0.14",
     "@fontsource-variable/mulish": "^5.0.17",
@@ -92,7 +92,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@convex-dev/tiptap": "file:../tiptap"
+      "@erquhart/convex-tiptap": "file:../tiptap"
     }
   }
 }

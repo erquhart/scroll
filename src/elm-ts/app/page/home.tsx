@@ -87,7 +87,7 @@ export const update =
             ),
             runMutation(
               convex,
-              api.createEmptyNote.default,
+              api.tiptap.createNote,
               () => option.some({ _tag: "NoteCreated" }),
               {},
             ),
@@ -450,7 +450,7 @@ const View = ({
     .exhaustive();
 
   const noteIds_ = option.fromNullable(
-    useQuery(api.getNotes.default, { datePaginationCursors: dateCursors }),
+    useQuery(api.tiptap.getNotes, { datePaginationCursors: dateCursors }),
   );
 
   useStableEffect(

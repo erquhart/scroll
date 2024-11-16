@@ -422,7 +422,7 @@ const sendSteps = (
 ): Cmd<LoadedMsg> =>
   runMutation(
     convex,
-    api.sendSteps.default,
+    api.tiptap.applySteps,
     () => option.some<LoadedMsg>({ _tag: "StepsSent" }),
     {
       noteId: loadedModel.noteId,
@@ -497,7 +497,7 @@ const LoadingNoteAndClientId = ({
   noteId: string;
 }) => {
   const optionVersionedNote = option.fromNullable(
-    useQuery(api.getVersionedNote.default, { noteId: noteId_ }),
+    useQuery(api.tiptap.getNote, { noteId: noteId_ }),
   );
 
   useStableEffect(
@@ -596,7 +596,7 @@ const LoadingEditorOrLoaded = ({
     .with({ _tag: "None" }, () => initialVersion)
     .exhaustive();
 
-  const stepsSince = useQuery(api.getStepsSince.default, {
+  const stepsSince = useQuery(api.tiptap.getStepsSinceVersion, {
     noteId: noteId_,
     version: currentVersion,
   });
